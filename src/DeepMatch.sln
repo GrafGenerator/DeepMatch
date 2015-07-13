@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeepMatch", "DeepMatch.csproj", "{DDBBE331-76EF-47A7-A39B-3D0825EE6FCF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "..\test\Tests.csproj", "{D84FD248-CCC7-4ADF-B5EC-2B1E73270E6C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DDBBE331-76EF-47A7-A39B-3D0825EE6FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDBBE331-76EF-47A7-A39B-3D0825EE6FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDBBE331-76EF-47A7-A39B-3D0825EE6FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDBBE331-76EF-47A7-A39B-3D0825EE6FCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D84FD248-CCC7-4ADF-B5EC-2B1E73270E6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D84FD248-CCC7-4ADF-B5EC-2B1E73270E6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D84FD248-CCC7-4ADF-B5EC-2B1E73270E6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D84FD248-CCC7-4ADF-B5EC-2B1E73270E6C}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
