@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DeepMatch
 {
-	public delegate bool TailFunc<T> (T item, TailFunc<T> tail);
+	public delegate bool TailFunc<in T> (T item, TailFunc2<T> tail);
+	public delegate bool TailFunc2<out T> (Func<T, TailFunc2<T>, bool> predicate);
 
 	public class Matcher<TI, TR>
 	{
@@ -31,23 +30,47 @@ namespace DeepMatch
 			return new Matcher<TI, TR>(this);
 		}
 
-		public TR Run(IEnumerable<TI> value)
+		public TR Run(IEnumerable<TI> sequence)
 		{
-			var first = value.First();
-			var tail = value.Skip(1);
+			var workSeq = sequence;
+			var marker = Split(workSeq);
 
-			foreach (var block in _blocks)
+			while (marker.Item1)
 			{
-				if(block.Item1(first, 
+				var result = RunBlocks(marker.Item2, marker.Item3);
+				if (result != null) return result(marker.Item2);
+
+				marker = Split(marker.Item3);
 			}
+
+			throw new MatchException();
 		}
 
-		private TailFunc<TI> MatchFunc(TI i, TailFunc<TI> tail)
+		private Tuple<bool, TI, IEnumerable<TI>> Split(IEnumerable<TI> sequence)
 		{
-			return (i, t) =>
-			{
+			TI first = default (TI);
+			var success = true;
 
-			};
+			try
+			{
+				first = sequence.First();
+			}
+			catch (InvalidOperationException)
+			{
+				success = false;
+			}
+
+			return new Tuple<bool, TI, IEnumerable<TI>>(success, first, sequence.Skip(1));
+		}
+
+		private Func<TI, TR> RunBlocks(TI first, IEnumerable<TI> tail)
+		{
+			return (from block in _blocks where block.Item1(first, MatchFunc(tail)) select block.Item2).FirstOrDefault();
+		}
+
+		private TailFunc2<TI> MatchFunc(IEnumerable<TI> tail)
+		{
+			return predicate => predicate(tail.FirstOrDefault(), MatchFunc(tail.Skip(1)));
 		}
 	}
 }
