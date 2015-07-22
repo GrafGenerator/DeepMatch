@@ -15,8 +15,14 @@ namespace Tests
 			_sequence0To9 = new[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		}
 
-		[TestCase(5,6,5)]
 		[TestCase(0,1,0)]
+		[TestCase(1,2,1)]
+		[TestCase(2,3,2)]
+		[TestCase(3,4,3)]
+		[TestCase(4,5,4)]
+		[TestCase(5,6,5)]
+		[TestCase(6,7,6)]
+		[TestCase(7,8,7)]
 		[TestCase(8,9,8)]
 		public void SimpleMatchTest(int a, int b, int expected)
 		{

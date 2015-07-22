@@ -32,8 +32,8 @@ namespace DeepMatch
 
 		public TR Run(IEnumerable<TI> sequence)
 		{
-			var workSeq = sequence;
-			var marker = Split(workSeq);
+			var enumerator = sequence.GetEnumerator();
+			var marker = Split(enumerator);
 
 			while (marker.Item1)
 			{
@@ -46,31 +46,27 @@ namespace DeepMatch
 			throw new MatchException();
 		}
 
-		private Tuple<bool, TI, IEnumerable<TI>> Split(IEnumerable<TI> sequence)
+		private Tuple<bool, TI, IEnumerator<TI>> Split(IEnumerator<TI> enumerator)
 		{
-			TI first = default (TI);
-			var success = true;
-
-			try
-			{
-				first = sequence.First();
-			}
-			catch (InvalidOperationException)
-			{
-				success = false;
-			}
-
-			return new Tuple<bool, TI, IEnumerable<TI>>(success, first, sequence.Skip(1));
+			if(!enumerator.MoveNext()) return new Tuple<bool, TI, IEnumerator<TI>>(false, default(TI), null);
+			return new Tuple<bool, TI, IEnumerator<TI>>(true, enumerator.Current, enumerator);
 		}
 
-		private Func<TI, TR> RunBlocks(TI first, IEnumerable<TI> tail)
+		private Func<TI, TR> RunBlocks(TI first, IEnumerator<TI> tail)
 		{
 			return (from block in _blocks where block.Item1(first, MatchFunc(tail)) select block.Item2).FirstOrDefault();
 		}
 
-		private TailFunc2<TI> MatchFunc(IEnumerable<TI> tail)
+		private TailFunc2<TI> MatchFunc(IEnumerator<TI> tail)
 		{
-			return predicate => predicate(tail.FirstOrDefault(), MatchFunc(tail.Skip(1)));
+			var marker = Split(tail);
+			if (!marker.Item1) return predicate => false;
+			return predicate => predicate(marker.Item2, MatchFunc(marker.Item3));
+		}
+
+		IEnumerable<TI> EnumerateTail(IEnumerator<TI> en)
+		{
+			while (en.MoveNext()) yield return en.Current;
 		}
 	}
 }
