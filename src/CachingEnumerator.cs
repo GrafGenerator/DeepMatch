@@ -36,7 +36,7 @@ namespace DeepMatch
 
 		public bool MoveNext()
 		{
-			var newCurrent = _currentIndex++;
+			var newCurrent = _currentIndex + 1;
 
 			if (_cache.ContainsKey(newCurrent))
 			{
@@ -47,6 +47,7 @@ namespace DeepMatch
 			if (_source.MoveNext())
 			{
 				_cache.Add(newCurrent, _source.Current);
+				_currentIndex = newCurrent;
 				return true;
 			}
 
