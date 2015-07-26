@@ -11,15 +11,11 @@ namespace DeepMatch
 	public class ListMatcher<TI, TR>
 	{
 		private readonly List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>> _blocks;
-
+		private Func<TR> _emptyMatchBlock;
+ 
 		public ListMatcher()
 		{
 			_blocks = new List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>>();
-		}
-
-		private ListMatcher(ListMatcher<TI, TR> other)
-		{
-			_blocks = other._blocks;
 		}
 
 		public ListMatcher<TI, TR> When(TailFunc<TI> predicate, ActionFunc<TI, TR> makeResult)
@@ -28,21 +24,33 @@ namespace DeepMatch
 				throw new ArgumentNullException("predicate");
 
 			_blocks.Add(new Tuple<TailFunc<TI>, ActionFunc<TI, TR>>(predicate, makeResult));
-			return new ListMatcher<TI, TR>(this);
+			return this;
 		}
 
-		public TR Run(IEnumerator<TI> sourceEnumerator, TR seed = default(TR))
+		public ListMatcher<TI, TR> WhenEmpty(Func<TR> makeResult)
+		{
+			_emptyMatchBlock = makeResult;
+			return this;
+		}
+
+		public TR Run(IEnumerator<TI> sourceEnumerator)
 		{
 			var enumerator = new CachingEnumerator<TI>(sourceEnumerator);
 			var marker = Split(enumerator);
 
-			if (!marker.Item1) return seed;
+			if (marker.Item1)
+			{
+				var heads = new List<TI> {marker.Item2};
+				var tailEnumerator = new[] {marker.Item3};
 
-			var heads = new List<TI> {marker.Item2};
-			var tailEnumerator = new[] {marker.Item3};
-
-			var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
-			if (result != null) return result(heads.ToArray(), EnumerateTail(tailEnumerator[0].Clone()));
+				var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
+				if (result != null) return result(heads.ToArray(), EnumerateTail(tailEnumerator[0].Clone()));
+			}
+			else
+			{
+				if (_emptyMatchBlock != null)
+					return _emptyMatchBlock();
+			}
 
 			throw new MatchException();
 		}
@@ -52,7 +60,9 @@ namespace DeepMatch
 		private ActionFunc<TI, TR> RunBlocks(TI first, CachingEnumerator<TI> tail, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
 		{
 			return
-				(from block in _blocks where block.Item1(first, MatchFunc(tail, heads, tailEnumerator)) select block.Item2)
+				(from block in _blocks
+					where block.Item1(first, MatchFunc(tail, heads, tailEnumerator))
+					select block.Item2)
 					.FirstOrDefault();
 		}
 
