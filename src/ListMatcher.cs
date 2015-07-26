@@ -6,7 +6,7 @@ namespace DeepMatch
 {
 	public delegate bool TailFunc<in T> (T head, TailFunc2<T> tail);
 	public delegate bool TailFunc2<out T> (Func<T, TailFunc2<T>, bool> predicate);
-	public delegate TR ActionFunc<in TI, out TR>(TI[] heads, IEnumerable<TI> tail);
+	public delegate TR ActionFunc<in TI, out TR>(TI[] heads, IEnumerator<TI> tail);
 
 	public class ListMatcher<TI, TR>
 	{
@@ -44,7 +44,7 @@ namespace DeepMatch
 				var tailEnumerator = new[] {marker.Item3};
 
 				var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
-				if (result != null) return result(heads.ToArray(), EnumerateTail(tailEnumerator[0].Clone()));
+				if (result != null) return result(heads.ToArray(), tailEnumerator[0].Clone());
 			}
 			else
 			{
@@ -88,12 +88,6 @@ namespace DeepMatch
 			if (enumerator == null || !enumerator.MoveNext())
 				return new Tuple<bool, TI, CachingEnumerator<TI>>(false, default(TI), null);
 			return new Tuple<bool, TI, CachingEnumerator<TI>>(true, enumerator.Current, enumerator.Shift(1));
-		}
-
-		IEnumerable<TI> EnumerateTail(IEnumerator<TI> en)
-		{
-			if(en == null) yield break;
-			while (en.MoveNext()) yield return en.Current;
 		}
 	}
 }

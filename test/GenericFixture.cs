@@ -53,7 +53,7 @@ namespace Tests
 		{
 			ListMatcher<int, int> matcher = null;
 			matcher = new ListMatcher<int, int>()
-				.When((_, __) => true, (head, tail) => head[0] + matcher.Run(tail.GetEnumerator()))
+				.When((_, __) => true, (head, tail) => head[0] + matcher.Run(tail))
 				.WhenEmpty(() => 0);
 				
 			var result = matcher.Run(((IEnumerable<int>)new []{0,1}).GetEnumerator());
