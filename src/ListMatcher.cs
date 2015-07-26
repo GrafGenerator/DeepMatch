@@ -42,7 +42,7 @@ namespace DeepMatch
 			var tailEnumerator = new[] {marker.Item3};
 
 			var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
-			if (result != null) return result(heads.ToArray(), EnumerateTail(tailEnumerator[0]));
+			if (result != null) return result(heads.ToArray(), EnumerateTail(tailEnumerator[0].Clone()));
 
 			throw new MatchException();
 		}
@@ -51,7 +51,9 @@ namespace DeepMatch
 
 		private ActionFunc<TI, TR> RunBlocks(TI first, CachingEnumerator<TI> tail, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
 		{
-			return (from block in _blocks where block.Item1(first, MatchFunc(tail, heads, tailEnumerator)) select block.Item2).FirstOrDefault();
+			return
+				(from block in _blocks where block.Item1(first, MatchFunc(tail, heads, tailEnumerator)) select block.Item2)
+					.FirstOrDefault();
 		}
 
 		private TailFunc2<TI> MatchFunc(CachingEnumerator<TI> enumerator, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
@@ -73,8 +75,9 @@ namespace DeepMatch
 
 		private Tuple<bool, TI, CachingEnumerator<TI>> Split(CachingEnumerator<TI> enumerator)
 		{
-			if (enumerator == null || !enumerator.MoveNext()) return new Tuple<bool, TI, CachingEnumerator<TI>>(false, default(TI), null);
-			return new Tuple<bool, TI, CachingEnumerator<TI>>(true, enumerator.Current, new CachingEnumerator<TI>(enumerator, 1));
+			if (enumerator == null || !enumerator.MoveNext())
+				return new Tuple<bool, TI, CachingEnumerator<TI>>(false, default(TI), null);
+			return new Tuple<bool, TI, CachingEnumerator<TI>>(true, enumerator.Current, enumerator.Shift(1));
 		}
 
 		IEnumerable<TI> EnumerateTail(IEnumerator<TI> en)

@@ -76,4 +76,17 @@ namespace DeepMatch
 			get { return Current; }
 		}
 	}
+
+	internal static class CachingEnumeratorExtensions
+	{
+		public static CachingEnumerator<T> Shift<T>(this CachingEnumerator<T> enumerator, int offset)
+		{
+			return new CachingEnumerator<T>(enumerator, offset);
+		}
+
+		public static CachingEnumerator<T> Clone<T>(this CachingEnumerator<T> enumerator)
+		{
+			return new CachingEnumerator<T>(enumerator, 0);
+		}
+	}
 }
