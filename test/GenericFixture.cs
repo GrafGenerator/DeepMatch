@@ -27,7 +27,7 @@ namespace Tests
 		public void SimpleMatchTest(int a, int b, int expected)
 		{
 
-			var match = new Matcher<int, int>()
+			var match = new ListMatcher<int, int>()
 				.When((i, t) => i == a && t((j, _) => j == b), (_, __) => 0)
 				.Run(_sequence0To9.GetEnumerator());
 
@@ -41,7 +41,7 @@ namespace Tests
 		[ExpectedException(typeof(MatchException))]
 		public void MoMatchTest(int a, int b, int expected)
 		{
-			var match = new Matcher<int, int>()
+			var match = new ListMatcher<int, int>()
 				.When((i, t) => i == a && t((j, _) => j == b), (_, __) => 0)
 				.Run(_sequence0To9.GetEnumerator());
 
@@ -51,21 +51,13 @@ namespace Tests
 		[Test]
 		public void RecursionTest()
 		{
-			Matcher<int, int> matcher = null;
-			matcher = new Matcher<int, int>()
+			ListMatcher<int, int> matcher = null;
+			matcher = new ListMatcher<int, int>()
 				.When((_, __) => true, (head, tail) => head[0] + matcher.Run(tail.GetEnumerator()));
 				
 			var result = matcher.Run(((IEnumerable<int>)new []{0,1}).GetEnumerator());
 
 			Assert.That(result, Is.EqualTo(1));
 		}
-
-		private int Sum(IEnumerable<int> enumerable)
-		{
-			return new Matcher<int, int>()
-				.When((_, __) => true, (head, tail) => head[0] + Sum(tail))
-				.Run(enumerable.GetEnumerator());
-		}
-
 	}
 }

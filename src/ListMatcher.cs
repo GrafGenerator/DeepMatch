@@ -8,27 +8,27 @@ namespace DeepMatch
 	public delegate bool TailFunc2<out T> (Func<T, TailFunc2<T>, bool> predicate);
 	public delegate TR ActionFunc<in TI, out TR>(TI[] heads, IEnumerable<TI> tail);
 
-	public class Matcher<TI, TR>
+	public class ListMatcher<TI, TR>
 	{
 		private readonly List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>> _blocks;
 
-		public Matcher()
+		public ListMatcher()
 		{
 			_blocks = new List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>>();
 		}
 
-		private Matcher(Matcher<TI, TR> other)
+		private ListMatcher(ListMatcher<TI, TR> other)
 		{
 			_blocks = other._blocks;
 		}
 
-		public Matcher<TI, TR> When(TailFunc<TI> predicate, ActionFunc<TI, TR> makeResult)
+		public ListMatcher<TI, TR> When(TailFunc<TI> predicate, ActionFunc<TI, TR> makeResult)
 		{
 			if (predicate == null)
 				throw new ArgumentNullException("predicate");
 
 			_blocks.Add(new Tuple<TailFunc<TI>, ActionFunc<TI, TR>>(predicate, makeResult));
-			return new Matcher<TI, TR>(this);
+			return new ListMatcher<TI, TR>(this);
 		}
 
 		public TR Run(IEnumerator<TI> sourceEnumerator, TR seed = default(TR))

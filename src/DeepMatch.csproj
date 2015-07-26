@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CachingEnumerator.cs" />
-    <Compile Include="Matcher.cs" />
+    <Compile Include="ListMatcher.cs" />
     <Compile Include="MatchException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
