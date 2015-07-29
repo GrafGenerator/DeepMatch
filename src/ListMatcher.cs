@@ -4,26 +4,26 @@ using System.Linq;
 
 namespace DeepMatch
 {
-	public delegate bool TailFunc<in T> (T head, TailFunc2<T> tail);
-	public delegate bool TailFunc2<out T> (Func<T, TailFunc2<T>, bool> predicate);
-	public delegate TR ActionFunc<in TI, out TR>(TI[] heads, IEnumerator<TI> tail);
+	public delegate bool MatchFunc<in T> (T head, TailFunc<T> tail);
+	public delegate bool TailFunc<out T> (Func<T, TailFunc<T>, bool> predicate);
+	public delegate TR ResultFunc<in TI, out TR>(TI[] heads, IEnumerator<TI> tail);
 
 	public class ListMatcher<TI, TR>
 	{
-		private readonly List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>> _blocks;
+		private readonly List<Tuple<MatchFunc<TI>, ResultFunc<TI, TR>>> _blocks;
 		private Func<TR> _emptyMatchBlock;
  
 		public ListMatcher()
 		{
-			_blocks = new List<Tuple<TailFunc<TI>, ActionFunc<TI, TR>>>();
+			_blocks = new List<Tuple<MatchFunc<TI>, ResultFunc<TI, TR>>>();
 		}
 
-		public ListMatcher<TI, TR> When(TailFunc<TI> predicate, ActionFunc<TI, TR> makeResult)
+		public ListMatcher<TI, TR> When(MatchFunc<TI> predicate, ResultFunc<TI, TR> makeResult)
 		{
 			if (predicate == null)
 				throw new ArgumentNullException("predicate");
 
-			_blocks.Add(new Tuple<TailFunc<TI>, ActionFunc<TI, TR>>(predicate, makeResult));
+			_blocks.Add(new Tuple<MatchFunc<TI>, ResultFunc<TI, TR>>(predicate, makeResult));
 			return this;
 		}
 
@@ -57,7 +57,7 @@ namespace DeepMatch
 
 
 
-		private ActionFunc<TI, TR> RunBlocks(TI first, CachingEnumerator<TI> tail, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
+		private ResultFunc<TI, TR> RunBlocks(TI first, CachingEnumerator<TI> tail, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
 		{
 			return
 				(from block in _blocks
@@ -66,7 +66,7 @@ namespace DeepMatch
 					.FirstOrDefault();
 		}
 
-		private TailFunc2<TI> MatchFunc(CachingEnumerator<TI> enumerator, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
+		private TailFunc<TI> MatchFunc(CachingEnumerator<TI> enumerator, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
 		{
 			var marker = Split(enumerator);
 			if (!marker.Item1) return _ => false;
