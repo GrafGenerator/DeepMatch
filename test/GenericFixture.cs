@@ -38,10 +38,73 @@ namespace Tests
 
 
 		#region Deep matching
+		/// <summary>
+		/// Tests for matching more than one sequential elements
+		/// </summary>
 
+		[Test]
+		[TestCaseSource("DeepMatchTestCases")]
+		public void DeepMatchTest(Tuple<MatchFunc<int>, IEnumerable<int>, IEnumerable<int>> input)
+		{
+			var heads = Enumerable.Empty<int>();
+			var tail = Enumerable.Empty<int>();
 
+			var result = new ListMatcher<int, int>()
+				.When(input.Item1, (h, t) =>
+				{
+					heads = h;
+					tail = t.AsEnumerable();
+					return 0;
+				})
+				.Run(_sequence1To50.GetEnumerator());
+
+			Assert.That(heads, Is.EqualTo(input.Item2));
+			Assert.That(tail, Is.EqualTo(input.Item3));
+		}
+
+		public IEnumerable<Tuple<MatchFunc<int>, IEnumerable<int>, IEnumerable<int>>> DeepMatchTestCases
+		{
+			get
+			{
+				yield return GenerateDeepMatchTestCase<int>(
+					1, 
+					(i, t) => i == 1
+				);
+
+				yield return GenerateDeepMatchTestCase<int>(
+					5,
+					(i1, t1) => 
+						i1 == 1 && t1((i2, t2) => 
+							i2 == 2 && t2((i3, t3) => 
+								i3 == 3 && t3((i4, t4) => 
+									i4 == 4 && t4((i5, _) => 
+										i5 == 5))))
+				);
+
+				yield return GenerateDeepMatchTestCase<int>(
+					10,
+					(i, t) => i == 1
+				);
+
+				yield return GenerateDeepMatchTestCase<int>(
+					20,
+					(i, t) => i == 1
+				);
+			}
+		}
+
+		private Tuple<MatchFunc<T>, IEnumerable<int>, IEnumerable<int>> GenerateDeepMatchTestCase<T>(int count,
+			MatchFunc<T> matchFunc)
+		{
+			return new Tuple<MatchFunc<T>, IEnumerable<int>, IEnumerable<int>>(
+					matchFunc,
+					Enumerable.Range(1, count),
+					_sequence1To50.Skip(count)
+				);
+		}
 
 		#endregion
+
 
 
 		#region Usual cases
@@ -68,6 +131,7 @@ namespace Tests
 		}
 
 		#endregion
+
 
 
 		#region No match tests
