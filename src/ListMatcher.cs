@@ -44,7 +44,7 @@ namespace DeepMatch
 				var tailEnumerator = new[] {marker.Item3};
 
 				var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
-				if (result != null) return result(heads.ToArray(), tailEnumerator[0].Clone());
+				if (result != null) return result(heads.ToArray(), tailEnumerator[0].Fork());
 			}
 			else
 			{

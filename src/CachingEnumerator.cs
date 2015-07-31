@@ -84,7 +84,7 @@ namespace DeepMatch
 			return new CachingEnumerator<T>(enumerator, offset);
 		}
 
-		public static CachingEnumerator<T> Clone<T>(this CachingEnumerator<T> enumerator)
+		public static CachingEnumerator<T> Fork<T>(this CachingEnumerator<T> enumerator)
 		{
 			return new CachingEnumerator<T>(enumerator, 0);
 		}
