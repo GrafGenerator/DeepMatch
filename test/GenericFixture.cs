@@ -43,6 +43,28 @@ namespace Tests
 		/// </summary>
 
 		[Test]
+		public void DeepMatch_ManyMatchBlocks_MatchingBlockFirst_Test()
+		{
+			var result = new ListMatcher<int, int>()
+				.When((i, _) => i == 1 && _((i1, __) => i1 == 2), (_, __) => 1)
+				.When((i, _) => i == 0 && _((i1, __) => i1 == 1), (_, __) => 0)
+				.Run(_sequence1To10.GetEnumerator());
+
+			Assert.That(result, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void DeepMatch_ManyMatchBlocks_MatchingBlockLast_Test()
+		{
+			var result = new ListMatcher<int, int>()
+				.When((i, _) => i == 0 && _((i1, __) => i1 == 1), (_, __) => 0)
+				.When((i, _) => i == 1 && _((i1, __) => i1 == 2), (_, __) => 1)
+				.Run(_sequence1To10.GetEnumerator());
+
+			Assert.That(result, Is.EqualTo(1));
+		}
+
+		[Test]
 		[TestCaseSource("DeepMatchTestCases")]
 		public void DeepMatchTest(Tuple<MatchFunc<int>, IEnumerable<int>, IEnumerable<int>> input)
 		{
@@ -118,6 +140,31 @@ namespace Tests
 				.Run(_sequenceEmpty.GetEnumerator());
 
 			Assert.That(result, Is.EqualTo(11));
+		}
+
+		[Test]
+		public void ManyMatchBlocks_MatchingBlockFirst_Test()
+		{
+			var result = new ListMatcher<int, int>()
+				.When((i, _) => i == 1, (_, __) => 1)
+				.When((i, _) => i == 0, (_, __) => 0)
+				.When((i, _) => i == 2, (_, __) => 2)
+				.When((i, _) => i == 3, (_, __) => 3)
+				.Run(_sequence1To10.GetEnumerator());
+
+			Assert.That(result, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void ManyMatchBlocks_MatchingBlockLast_Test()
+		{
+			var result = new ListMatcher<int, int>()
+				.When((i, _) => i == 3, (_, __) => 3)
+				.When((i, _) => i == 2, (_, __) => 2)
+				.When((i, _) => i == 1, (_, __) => 1)
+				.Run(_sequence1To10.GetEnumerator());
+
+			Assert.That(result, Is.EqualTo(1));
 		}
 
 		#endregion
