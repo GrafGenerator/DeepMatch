@@ -80,16 +80,6 @@ namespace Tests
 									i4 == 4 && t4((i5, _) => 
 										i5 == 5))))
 				);
-
-				yield return GenerateDeepMatchTestCase<int>(
-					10,
-					(i, t) => i == 1
-				);
-
-				yield return GenerateDeepMatchTestCase<int>(
-					20,
-					(i, t) => i == 1
-				);
 			}
 		}
 
