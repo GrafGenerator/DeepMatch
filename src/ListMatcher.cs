@@ -40,11 +40,10 @@ namespace DeepMatch
 
 			if (marker.Item1)
 			{
-				var heads = new List<TI> {marker.Item2};
 				var tailEnumerator = new[] {marker.Item3};
 
-				var result = RunBlocks(marker.Item2, marker.Item3, heads, tailEnumerator);
-				if (result != null) return result(heads.ToArray(), tailEnumerator[0].Clone());
+				var result = RunBlocks(marker.Item2, marker.Item3, tailEnumerator);
+				if (result != null) return result.Item1(result.Item2.ToArray(), tailEnumerator[0].Fork());
 			}
 			else
 			{
@@ -57,12 +56,13 @@ namespace DeepMatch
 
 
 
-		private ResultFunc<TI, TR> RunBlocks(TI first, CachingEnumerator<TI> tail, List<TI> heads, CachingEnumerator<TI>[] tailEnumerator)
+		private Tuple<ResultFunc<TI, TR>, List<TI>> RunBlocks(TI first, CachingEnumerator<TI> tail, CachingEnumerator<TI>[] tailEnumerator)
 		{
 			return
 				(from block in _blocks
-					where block.Item1(first, MatchFunc(tail.Clone(), heads, tailEnumerator))
-					select block.Item2)
+					let heads = new List<TI>{first}
+					where block.Item1(first, MatchFunc(tail.Fork(), heads, tailEnumerator))
+					select new Tuple<ResultFunc<TI, TR>, List<TI>>(block.Item2, heads))
 					.FirstOrDefault();
 		}
 
