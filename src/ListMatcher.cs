@@ -61,7 +61,7 @@ namespace DeepMatch
 		{
 			return
 				(from block in _blocks
-					where block.Item1(first, MatchFunc(tail.Clone(), heads, tailEnumerator))
+					where block.Item1(first, MatchFunc(tail.Fork(), heads, tailEnumerator))
 					select block.Item2)
 					.FirstOrDefault();
 		}
