@@ -170,6 +170,23 @@ namespace Tests
 		#endregion
 
 
+		#region Heads and tails tests
+
+		[Test]
+		public void TwoCloseMatchBlocks_HeadsShouldNotBePolluted_Test()
+		{
+			var result = new ListMatcher<int, int[]>()
+				.When((i, t1) => i == 1 && t1((j, t2) => j == 2 && t2((k, _) => k == 4)), (heads, __) => heads)
+				.When((i, t1) => i == 1 && t1((j, t2) => j == 2 && t2((k, _) => k == 3)), (heads, __) => heads)
+				.Run(_sequence1To10.GetEnumerator());
+
+			var expected = new[]{1, 2, 3};
+
+			Assert.That(result, Is.EqualTo(expected));
+		}
+
+		#endregion
+
 
 		#region No match tests
 
