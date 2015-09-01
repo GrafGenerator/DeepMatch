@@ -1,0 +1,8 @@
+language: csharp
+solution: src/DeepMatch.sln
+install:
+  - nuget restore src/DeepMatch.sln
+  - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
+script:
+  - xbuild /p:Configuration=Release src/DeepMatch.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./test/bin/Debug/Tests.dll
