@@ -1,4 +1,4 @@
-# DeepMatch
+# DeepMatch [![Build Status](https://travis-ci.org/GrafGenerator/DeepMatch.svg?branch=develop)](https://travis-ci.org/GrafGenerator/DeepMatch)
 The C# library for pattern matching.
 
 **Note:** this is ***very early development***, and a subject for major changes in the future.
